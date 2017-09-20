@@ -1,4 +1,4 @@
-const sqlite3 = require('sqlite3').verbose();
+var MongoClient = require('mongodb').MongoClient;
 
 var state = {
     db: null
@@ -9,12 +9,10 @@ exports.connect = function (url, done) {
         return done();
     }
 
-    let db = new sqlite3.Database(url, (err) => {
+    MongoClient.connect(url, function (err, db) {
         if (err) {
-            console.error(err.message);
             return done(err);
         }
-        console.log('Connected to db');
         state.db = db;
         return done();
     });
@@ -26,7 +24,7 @@ exports.get = function () {
 
 exports.close = function (done) {
     if (!!state.db) {
-        state.db.close((err) => {
+        state.db.close(function (err, result) {
             state.db = null;
             state.mode = null;
             return done(err);
