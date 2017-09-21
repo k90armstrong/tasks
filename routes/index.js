@@ -10,9 +10,11 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.get('/api/update/insert', function(req, res, next) {
-  console.log(req.params.data);
-  res.send("yo!")
+router.post('/api/update/insert', function(req, res, next) {
+  var data = req.body;
+  db.get()
+
+  //res.send("yo!")
   // var data = [];
   // stopWatch.start();
   // db.get().all(`SELECT Value as val, UPI as id, Time as time

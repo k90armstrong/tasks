@@ -8,6 +8,8 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var users = require('./routes/users');
 
+let db = require('./Utilities/db')
+
 var app = express();
 
 // view engine setup
@@ -42,5 +44,11 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+db.connect("mongodb://localhost:27017/infoscan", function (err) {
+  if (!err) {
+    console.log("Connected to mongo")
+  }
+})
 
 module.exports = app;
