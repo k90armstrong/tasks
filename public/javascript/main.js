@@ -1,6 +1,6 @@
 $.ajax({
-    url: 'https://192.168.30.245:2525/api/update/insert',
-    type: 'get',
+    url: 'http://localhost:2525/api/update/insert',
+    type: 'post',
     dataType: 'json',
     success: function (data) {
         $('h1').html(data.msg);
