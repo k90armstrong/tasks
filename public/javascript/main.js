@@ -62,7 +62,6 @@ function insertTaskAjax (task) {
         },
         data: task
     });
-<<<<<<< HEAD
 }
 
 
@@ -88,6 +87,3 @@ $( document ).ready(function() {
     });
 // build them
 });
-=======
-}
->>>>>>> 2adc29716fbf5db07e6255843881eddb6b65c947
