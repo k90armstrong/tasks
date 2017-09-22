@@ -8,7 +8,7 @@ $('button').click(function(){
 function insertTaskAjax (task) {
     $.ajax({
         url: 'http://192.168.30.245:2525/api/update/insert',
-        type: 'get',
+        type: 'post',
         dataType: 'json',
         success: function (data) {
             $('h1').html(data.msg);
