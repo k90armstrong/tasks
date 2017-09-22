@@ -13,6 +13,7 @@ router.get('/', function(req, res, next) {
 
 // Insert Method. Returns the task that was entered (indluding _id)
 router.post('/api/update/insert', function(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
   let data = req.body;
   let newTask = {
     complete: false,
@@ -20,15 +21,15 @@ router.post('/api/update/insert', function(req, res, next) {
     owner: 0,
     assignees: [],
     creationDate: (new Date).getTime(),
-    completionDate: 0,
+    dueDate: 0,
     nodeRefs: []
   }
 
   // only add the task if there is a task string. a blank task is unusable
   if (data.task) {
     newTask.task = data.task
-    if (data.completionDate) {
-      newTask.completionDate = data.completionDate;
+    if (data.dueDate) {
+      newTask.dueDate = parseInt(data.dueDate);
     }
     if (data.owner) {
       newTask.owner = data.owner;
@@ -38,9 +39,6 @@ router.post('/api/update/insert', function(req, res, next) {
         // verify that the assignees exist in users
         newTask.assignees = data.assignees;
       }
-    }
-    if (data.completionDate) {
-      newTask.completionDate = data.completionDate;
     }
     if (data.nodeRefs){
       if (array.isArray(data.nodeRefs)) {
@@ -56,7 +54,7 @@ router.post('/api/update/insert', function(req, res, next) {
       }
       else {
         console.log("inserted new node");
-        res.status(200).send(JSON.stringify({inserted: results.ops}));
+        res.status(200).send(JSON.stringify(results.ops[0]));
       }
     });
     
@@ -73,8 +71,8 @@ router.post('/api/update/edit', function(req, res, next) {
 
   // only add the task if there is a task string
   if (data._id) {
-    if (data.completionDate) {
-      newValues.completionDate = data.completionDate;
+    if (data.dueDate) {
+      newValues.dueDate = data.dueDate;
     }
     if (data.owner) {
       newValues.owner = data.owner;
@@ -85,8 +83,8 @@ router.post('/api/update/edit', function(req, res, next) {
         newValues.assignees = data.assignees;
       }
     }
-    if (data.completionDate) {
-      newValues.completionDate = data.completionDate;
+    if (data.dueDate) {
+      newValues.dueDate = data.dueDate;
     }
     if (data.nodeRefs){
       if (array.isArray(data.nodeRefs)) {
@@ -153,8 +151,8 @@ router.get('/api/tasks', function(req, res, next) {
     if (filters.owner) {
       query.owner = {$regex: filters.owner};
     }
-    if (filters.completionDate) {
-      query.completionDate = {$gt:filters.completionDate[0], $lt:filters.completionDate[1]}
+    if (filters.dueDate) {
+      query.dueDate = {$gt:filters.dueDate[0], $lt:filters.dueDate[1]}
     }
     if (filters.creationDate) {
       query.creationDate = {$gt:filters.creationDate[0], $lt:filters.creationDate[1]}
