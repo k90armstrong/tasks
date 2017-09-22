@@ -18,24 +18,26 @@
                 <h1>Task Board</h1>
                 <h2 id="today">Todays Date</h2>
             </div>
-            <div class="row">
-                <div class="col-md-4 col-md-offset-4">
-                    <div class="container">
-                        <div class="btn-group center" role="group" aria-label="filters">
-                            <button id="see-all-btn" type="button" class="btn btn-default">See All</button>
-                            <button id="see-completed-btn" type="button" class="btn btn-default">See Comleted</button>
-                            <button id="see-uncompleted-btn" type="button" class="btn btn-default">See Uncompleted</button>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 col-md-offset-4">
+                        <div class="container">
+                            <div class="btn-group center" role="group" aria-label="filters">
+                                <button id="see-all-btn" type="button" class="btn btn-default">See All</button>
+                                <button id="see-completed-btn" type="button" class="btn btn-default">See Comleted</button>
+                                <button id="see-uncompleted-btn" type="button" class="btn btn-default">See Uncompleted</button>
+                            </div>
                         </div>
+                        <div class="tasks-container pre-scrollable">
+                            <ul class="list-unstyled" id="tasks">
+                                <!-- This is where the tasks will go in from javascript -->
+                            </ul>
+                        </div>
+                        <form>
+                            <input class="form-control" type="text" placeholder="Fix the Summit's Router" name="task" id="task">
+                            <button id="add-task-btn" class="btn btn-block btn-primary">Add Task</button>
+                        </form>
                     </div>
-                    <div class="tasks-container pre-scrollable">
-                        <ul class="list-unstyled" id="tasks">
-                            <!-- This is where the tasks will go in from javascript -->
-                        </ul>
-                    </div>
-                    <form>
-                        <input class="form-control" type="text" placeholder="Fix the Summit's Router" name="task" id="task">
-                        <button id="add-task-btn" class="btn btn-block btn-primary">Add Task</button>
-                    </form>
                 </div>
             </div>
         </div>
