@@ -4,6 +4,7 @@ var db = require('../Utilities/db');
 var Stopwatch = require('../Utilities/stopwatch');
 var stopWatch = new Stopwatch();
 var infoMath = require('../Utilities/infoMath');
+var mongo = require('mongodb')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -48,12 +49,13 @@ router.post('/api/update/insert', function(req, res, next) {
       }
     }
 
-    db.get().collection('tasks').insertOne(newTask, function (err, response) {
+    db.get().collection('tasks').insertOne(newTask, function (err, results) {
       if(err) {
         console.log("failed to insert");
       }
       else {
-        res.send(JSON.stringify({inserted: response.ops}));
+        console.log("inserted new node")
+        res.send(JSON.stringify({inserted: results.ops}));
       }
     });
     
@@ -63,43 +65,66 @@ router.post('/api/update/insert', function(req, res, next) {
 router.post('/api/update/edit', function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   let data = req.body;
-  let newTask = {
-    complete: false,
-    task: "",
-    owner: 0,
-    assignees: [],
-    creationDate: (new Date).getTime(),
-    completionDate: 0,
-    nodeRefs: []
-  }
+  var o_id = new mongo.ObjectID(data._id);
+  let query = {_id:o_id};
+  
+  let newValues = {};
 
   // only add the task if there is a task string
-  if (data.task) {
-    newTask.task = data.task
+  if (data._id) {
     if (data.completionDate) {
-      newTask.completionDate = data.completionDate;
+      newValues.completionDate = data.completionDate;
     }
     if (data.owner) {
-      newTask.owner = data.owner;
+      newValues.owner = data.owner;
     }
     if (data.assignees){
       if (array.isArray(data.assignees)) {
         // verify that the assignees exist in users
-        newTask.assignees = data.assignees;
+        newValues.assignees = data.assignees;
       }
     }
     if (data.completionDate) {
-      newTask.completionDate = data.completionDate;
+      newValues.completionDate = data.completionDate;
     }
     if (data.nodeRefs){
       if (array.isArray(data.nodeRefs)) {
         // verify that nodeRefs are valid nodes
-        newTask.nodeRefs = nodeRefs;
+        newValues.nodeRefs = nodeRefs;
+      }
+    }
+    if (data.complete) {
+      if (data.complete === "true") {
+        newValues.complete = true;
+      }
+      else {
+        newValues.complete = false;
       }
     }
   }
+
+  db.get().collection('tasks').updateOne(query, {$set:newValues}, function (err, results) {
+    if (!err){
+      console.log("modified node")
+    }
+  });
+
 });
 
+router.post('/api/update/delete', function(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  let data = req.body;
+  var o_id = new mongo.ObjectID(data._id);
+  let query = {_id:o_id};
+
+  db.get().collection('tasks').deleteOne(query, function (err, results) {
+    if (!err){
+      console.log("deleted node")
+      res.send(JSON.stringify(results.ops))
+    }
+  });
+
+});
 
 // Search method. If no filters are passed, then all tasks will be returned.
 router.get('/api/tasks', function(req, res, next) {
@@ -134,23 +159,23 @@ router.get('/api/tasks', function(req, res, next) {
       else {
         query.complete = false;
       }
-      
     }
 
     db.get().collection('tasks').find(query).toArray(function (err, results){
       if (!err) {
         console.log(query);
-        res.json(JSON.stringify({tasks:results}));
+        res.send(JSON.stringify({tasks:results}));
       }
     });
   }
   
   else {
     // get all 
-    console.log("empty filters");
+    console.log("No filters specified");
     db.get().collection('tasks').find({}).toArray(function (err, results){
       if (!err) {
-        res.json(JSON.stringify({tasks: results}));
+        console.log("returning all nodes")
+        res.send(JSON.stringify({tasks: results}));
       }
     });
   }  
