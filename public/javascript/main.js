@@ -136,6 +136,7 @@ function addTaskElement(task) {
     label.appendChild(input);
     var strong = document.createElement("strong");
     strong.innerHTML = task.task;
+    strong.className = 'marker-font';
     label.appendChild(strong);
     // apped task to ul
     $('#tasks').append(li);
