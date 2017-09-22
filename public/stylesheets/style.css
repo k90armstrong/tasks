@@ -1,3 +1,7 @@
 .tasks-container {
   max-height: 400px;
 }
+
+body {
+  width: 100%;
+}

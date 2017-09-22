@@ -213,5 +213,6 @@ $(document).ready(function () {
 
     // main 
     // load the tasks
+    $('#see-all-btn').click()
     // build them
 });
