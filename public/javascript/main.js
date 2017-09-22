@@ -57,7 +57,7 @@ function insertTaskAjax(task) {
         dataType: 'json',
         success: function (data) {
             $('h1').html(data.msg);
-            var newTask = new Task(data.task, )
+            //var newTask = new Task(data.task);
         },
         data: task
     });
@@ -84,7 +84,7 @@ function getAllTasks(cb) {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            var tasks = JSON.parse(data);
+            var tasks = data;
             return cb(tasks);
         },
         data: {} // send nothing to get all tasks
@@ -97,7 +97,7 @@ function getCompletedTasks(cb) {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            var tasks = JSON.parse(data);
+            var tasks = data;
             return cb(tasks);
         },
         data: {
@@ -112,7 +112,7 @@ function getUncompletedTasks(cb) {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            var tasks = JSON.parse(data);
+            var tasks = data;
             return cb(tasks);
         },
         data: {
@@ -121,43 +121,85 @@ function getUncompletedTasks(cb) {
     });
 }
 
+function addTaskElement(task) {
+    var li = document.createElement("li");
+    var div = document.createElement("div");
+    div.id = task._id;
+    // add click even to the div
+    $(div).click(changeChecked);
+    div.className = "checkbox";
+    li.appendChild(div);
+    var label = document.createElement("label");
+    div.appendChild(label);
+    var input = document.createElement("INPUT");
+    input.type = "checkbox";
+    input.checked = task.complete;
+    label.appendChild(input);
+    var strong = document.createElement("strong");
+    strong.innerHTML = task.task;
+    label.appendChild(strong);
+    // apped task to ul
+    $('#tasks').append(li);
+}
+
+function addAllTaskElements(tasks) {
+    tasks.tasks.forEach((task) => {
+        addTaskElement(task);
+    });
+}
+
+function clearAllTaskElements(task) {
+    $('#tasks').empty();
+}
+
+function changeChecked() {
+    console.log('hi');
+    var checked = $(this.firstChild.firstChild).is(':checked');
+    console.log(checked);
+    $.ajax({
+        url: 'http://192.168.30.245:2525/api/update/edit',
+        type: 'post',
+        dataType: 'json',
+        success: function (data) {
+            console.log(data);
+            // do an alert thingy??
+        },
+        data: {
+            _id: this.id,
+            complete: checked
+        }
+    });
+}
 // start of main 
 $(document).ready(function () {
 
     document.getElementById('today').innerHTML = formatDate(new Date());
     // adding even handlers below here
-    $('#add-task-button').click(function () {
+    $('#add-task-btn').click(function () {
         insertTaskAjax({
             task: $('#task').val()
         });
     });
     $('#see-completed-btn').click(function () {
         getCompletedTasks((tasks) => {
-            console.log(tasks);
+            clearAllTaskElements();
+            addAllTaskElements(tasks);
         });
     });
     $('#see-all-btn').click(function () {
         getAllTasks((tasks) => {
-            console.log(tasks);
+            clearAllTaskElements();
+            addAllTaskElements(tasks);
         });
     });
     $('#see-uncompleted-btn').click(function () {
         getUncompletedTasks((tasks) => {
-            console.log(tasks);
+            clearAllTaskElements();
+            addAllTaskElements(tasks);
         });
     });
 
     // main 
     // load the tasks
-    $.ajax({
-        url: 'http://192.168.30.245:2525/api/tasks',
-        type: 'get',
-        dataType: 'json',
-        success: function (data) {
-            var tasks = JSON.parse(data);
-            console.log(tasks);
-        },
-        data: {} // send nothing to get all tasks
-    });
     // build them
 });
