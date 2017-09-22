@@ -10,6 +10,7 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+// Insert Method. Returns the task that was entered (indluding _id)
 router.post('/api/update/insert', function(req, res, next) {
   let data = req.body;
   let newTask = {
@@ -22,7 +23,7 @@ router.post('/api/update/insert', function(req, res, next) {
     nodeRefs: []
   }
 
-  // only add the task if there is a task string
+  // only add the task if there is a task string. a blank task is unusable
   if (data.task) {
     newTask.task = data.task
     if (data.completionDate) {
@@ -99,6 +100,8 @@ router.post('/api/update/edit', function(req, res, next) {
   }
 });
 
+
+// Search method. If no filters are passed, then all tasks will be returned.
 router.get('/api/tasks', function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   let filters = req.query;
@@ -108,29 +111,38 @@ router.get('/api/tasks', function(req, res, next) {
     if (filters.task) {
       query.task = {$regex: filters.task};
     }
-    if (filters.assignees.length > 0) {
+    if (filters.assignees) {
       let a = [];
       for (var assignee of filters.assignees) {
         a.push({assignees: assignee})
       }
       query.assignees = {$and: a}
     }
-    if (filters.owner > 0) {
+    if (filters.owner) {
       query.owner = {$regex: filters.owner};
     }
-    if (filters.completionDate.length === 2) {
+    if (filters.completionDate) {
       query.completionDate = {$gt:filters.completionDate[0], $lt:filters.completionDate[1]}
     }
-    if (filters.creationDate.length === 2) {
+    if (filters.creationDate) {
       query.creationDate = {$gt:filters.creationDate[0], $lt:filters.creationDate[1]}
+    }
+    if (filters.complete) {
+      if (filters.complete === "true") {
+        query.complete = true;
+      }
+      else {
+        query.complete = false;
+      }
+      
     }
 
     db.get().collection('tasks').find(query).toArray(function (err, results){
       if (!err) {
+        console.log(query);
         res.json(JSON.stringify({tasks:results}));
       }
     });
-    
   }
   
   else {
