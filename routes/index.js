@@ -52,10 +52,11 @@ router.post('/api/update/insert', function(req, res, next) {
     db.get().collection('tasks').insertOne(newTask, function (err, results) {
       if(err) {
         console.log("failed to insert");
+        res.sendStatus(500);
       }
       else {
-        console.log("inserted new node")
-        res.send(JSON.stringify({inserted: results.ops}));
+        console.log("inserted new node");
+        res.status(200).send(JSON.stringify({inserted: results.ops}));
       }
     });
     
@@ -105,7 +106,9 @@ router.post('/api/update/edit', function(req, res, next) {
 
   db.get().collection('tasks').updateOne(query, {$set:newValues}, function (err, results) {
     if (!err){
-      console.log("modified node")
+      res.sendStatus(200);
+      console.log("modified node");
+      
     }
   });
 
@@ -120,7 +123,11 @@ router.post('/api/update/delete', function(req, res, next) {
   db.get().collection('tasks').deleteOne(query, function (err, results) {
     if (!err){
       console.log("deleted node")
-      res.send(JSON.stringify(results.ops))
+      res.status(200).send(JSON.stringify(results.ops));
+      
+    }
+    else {
+      res.sendStatus(500);
     }
   });
 
@@ -164,7 +171,12 @@ router.get('/api/tasks', function(req, res, next) {
     db.get().collection('tasks').find(query).toArray(function (err, results){
       if (!err) {
         console.log(query);
-        res.send(JSON.stringify({tasks:results}));
+        res.sets
+        res.status(200).send(JSON.stringify({tasks:results}));
+        
+      }
+      else {
+        res.sendStatus(500);
       }
     });
   }
@@ -174,8 +186,11 @@ router.get('/api/tasks', function(req, res, next) {
     console.log("No filters specified");
     db.get().collection('tasks').find({}).toArray(function (err, results){
       if (!err) {
-        console.log("returning all nodes")
-        res.send(JSON.stringify({tasks: results}));
+        console.log("returning all nodes");
+        res.status(200).send(JSON.stringify({tasks: results}));
+      }
+      else {
+        res.sendStatus(500);
       }
     });
   }  
