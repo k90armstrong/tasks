@@ -50,14 +50,13 @@ class TaskController {
 }
 
 // functions below here
-function insertTaskAjax(task) {
+function insertTaskAjax(task, cb) {
     $.ajax({
         url: 'http://192.168.30.245:2525/api/update/insert',
         type: 'post',
         dataType: 'json',
-        success: function (data) {
-            $('h1').html(data.msg);
-            //var newTask = new Task(data.task);
+        success: function (task) {
+            return cb(task);
         },
         data: task
     });
@@ -176,17 +175,35 @@ function clearBtnSelected() {
     $('#see-completed-btn').removeClass('btn-info');
     $('#see-all-btn').removeClass('btn-info');
 }
+
+function openSnackBar(message) {
+    var x = document.getElementById("snackbar");
+    x.className = "show";
+    x.innerHTML = message;
+    setTimeout(function () {
+        x.className = x.className.replace("show", "");
+    }, 3000);
+
+}
 // start of main 
 $(document).ready(function () {
-
     document.getElementById('today').innerHTML = formatDate(new Date());
     // adding even handlers below here
     $('#add-task-btn').click(function () {
         insertTaskAjax({
-            task: $('#task').val()
+            task: $('#task').val(),
+            dueDate: new Date($('#date-picker').val()).getTime()
+        }, (task) => {
+            //clear the input box
+            $('#task').val('');
+            $('#date-picker').val('');
+            // add the new task to the 
+            addTaskElement(task);
+            openSnackBar('Task was created! Hurry and complete it!');
         });
     });
     $('#see-completed-btn').click(function () {
+        console.log('see complete');
         clearBtnSelected();
         $('#see-completed-btn').addClass('btn-info');
         getCompletedTasks((tasks) => {
@@ -195,6 +212,7 @@ $(document).ready(function () {
         });
     });
     $('#see-all-btn').click(function () {
+        console.log('see all');
         clearBtnSelected();
         $('#see-all-btn').addClass('btn-info');
         getAllTasks((tasks) => {
@@ -203,6 +221,7 @@ $(document).ready(function () {
         });
     });
     $('#see-uncompleted-btn').click(function () {
+        console.log('see uncomplete');
         clearBtnSelected();
         $('#see-uncompleted-btn').addClass('btn-info');
         getUncompletedTasks((tasks) => {
@@ -210,9 +229,6 @@ $(document).ready(function () {
             addAllTaskElements(tasks);
         });
     });
-
-    // main 
-    // load the tasks
-    $('#see-all-btn').click()
-    // build them
+    // load the tasks when page loads
+    $('#see-all-btn').click();
 });

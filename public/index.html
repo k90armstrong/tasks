@@ -33,14 +33,19 @@
                                 <!-- This is where the tasks will go in from javascript -->
                             </ul>
                         </div>
-                        <form>
-                            <input class="form-control" type="text" placeholder="Fix the Summit's Router" name="task" id="task">
-                            <button id="add-task-btn" class="btn btn-block btn-primary">Add Task</button>
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <input class="form-control" type="text" placeholder="Fix the Summit's Router" name="task" id="task">
+                                <label for="date-picker" class="control-label">Due Date: </label>
+                                <input data-provide="datepicker" type="date" id="date-picker" required>
+                                <button id="add-task-btn" class="btn btn-block btn-primary" type="button">Add Task</button>
+                            </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
+        <div id="snackbar"></div>
     </body>
     <script src="javascript/main.js"></script>
 
