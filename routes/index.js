@@ -10,29 +10,149 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+// Insert Method. Returns the task that was entered (indluding _id)
 router.post('/api/update/insert', function(req, res, next) {
-  var data = req.body;
-  db.get()
+  let data = req.body;
+  let newTask = {
+    complete: false,
+    task: "",
+    owner: 0,
+    assignees: [],
+    creationDate: (new Date).getTime(),
+    completionDate: 0,
+    nodeRefs: []
+  }
 
-  //res.send("yo!")
-  // var data = [];
-  // stopWatch.start();
-  // db.get().all(`SELECT Value as val, UPI as id, Time as time
-  //           FROM datastore WHERE UPI=? AND TIME >= ? AND TIME <= ?`, 
-  //           [req.params.upi, req.params.starttime, req.params.endtime], (err, rows) => {
-  //   if (err) {
-  //     console.error(err.message);
-  //     res.end(err.message);
-  //     return next();
-  //   }
-  //   data = rows;
-  //   for (var d of data) {
-  //     d.time = new Date(d.time * 1000.0);
-  //   }
-  //   data = infoMath.resample(data, req.params.operation, req.params.delta);
-  //   var l = data.length;
-  //   stopWatch.stop();
-  //   res.render('table', {time: stopWatch.getTimeFormatted(), length: l, dataObject: JSON.stringify(data)});
-  // });
+  // only add the task if there is a task string. a blank task is unusable
+  if (data.task) {
+    newTask.task = data.task
+    if (data.completionDate) {
+      newTask.completionDate = data.completionDate;
+    }
+    if (data.owner) {
+      newTask.owner = data.owner;
+    }
+    if (data.assignees){
+      if (array.isArray(data.assignees)) {
+        // verify that the assignees exist in users
+        newTask.assignees = data.assignees;
+      }
+    }
+    if (data.completionDate) {
+      newTask.completionDate = data.completionDate;
+    }
+    if (data.nodeRefs){
+      if (array.isArray(data.nodeRefs)) {
+        // verify that nodeRefs are valid nodes
+        newTask.nodeRefs = nodeRefs;
+      }
+    }
+
+    db.get().collection('tasks').insertOne(newTask, function (err, response) {
+      if(err) {
+        console.log("failed to insert");
+      }
+      else {
+        res.send(JSON.stringify({inserted: response.ops}));
+      }
+    });
+    
+  }
+});
+
+router.post('/api/update/edit', function(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  let data = req.body;
+  let newTask = {
+    complete: false,
+    task: "",
+    owner: 0,
+    assignees: [],
+    creationDate: (new Date).getTime(),
+    completionDate: 0,
+    nodeRefs: []
+  }
+
+  // only add the task if there is a task string
+  if (data.task) {
+    newTask.task = data.task
+    if (data.completionDate) {
+      newTask.completionDate = data.completionDate;
+    }
+    if (data.owner) {
+      newTask.owner = data.owner;
+    }
+    if (data.assignees){
+      if (array.isArray(data.assignees)) {
+        // verify that the assignees exist in users
+        newTask.assignees = data.assignees;
+      }
+    }
+    if (data.completionDate) {
+      newTask.completionDate = data.completionDate;
+    }
+    if (data.nodeRefs){
+      if (array.isArray(data.nodeRefs)) {
+        // verify that nodeRefs are valid nodes
+        newTask.nodeRefs = nodeRefs;
+      }
+    }
+  }
+});
+
+
+// Search method. If no filters are passed, then all tasks will be returned.
+router.get('/api/tasks', function(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  let filters = req.query;
+
+  if (Object.keys(filters).length) {
+    let query = {};
+    if (filters.task) {
+      query.task = {$regex: filters.task};
+    }
+    if (filters.assignees) {
+      let a = [];
+      for (var assignee of filters.assignees) {
+        a.push({assignees: assignee})
+      }
+      query.assignees = {$and: a}
+    }
+    if (filters.owner) {
+      query.owner = {$regex: filters.owner};
+    }
+    if (filters.completionDate) {
+      query.completionDate = {$gt:filters.completionDate[0], $lt:filters.completionDate[1]}
+    }
+    if (filters.creationDate) {
+      query.creationDate = {$gt:filters.creationDate[0], $lt:filters.creationDate[1]}
+    }
+    if (filters.complete) {
+      if (filters.complete === "true") {
+        query.complete = true;
+      }
+      else {
+        query.complete = false;
+      }
+      
+    }
+
+    db.get().collection('tasks').find(query).toArray(function (err, results){
+      if (!err) {
+        console.log(query);
+        res.json(JSON.stringify({tasks:results}));
+      }
+    });
+  }
+  
+  else {
+    // get all 
+    console.log("empty filters");
+    db.get().collection('tasks').find({}).toArray(function (err, results){
+      if (!err) {
+        res.json(JSON.stringify({tasks: results}));
+      }
+    });
+  }  
 });
 module.exports = router;
