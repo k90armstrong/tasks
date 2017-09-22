@@ -1,14 +1,13 @@
-
 // classes below here
 class Task {
     constructor(task, id, complete, creationDate, completionDate, assignees, owner, nodeRefs) {
-      this.task = task;
-      this.id = id;
-      this.complete = complete;
-      this.creationDate = creationDate;
-      this.assignees = assignees;
-      this.owner = this.owner;
-      this.nodeRefs = nodeRefs;
+        this.task = task;
+        this.id = id;
+        this.complete = complete;
+        this.creationDate = creationDate;
+        this.assignees = assignees;
+        this.owner = this.owner;
+        this.nodeRefs = nodeRefs;
     }
     check() {
         this.complete = true;
@@ -18,16 +17,16 @@ class Task {
         this.complete = false;
         return this;
     }
-  }
-  // this is a singleton pattern implementation
-  var TaskSingleton = (function () {
+}
+// this is a singleton pattern implementation
+var TaskSingleton = (function () {
     var instance;
- 
+
     function createInstance() {
         var taskController = new TaskController();
         return taskController;
     }
- 
+
     return {
         getInstance: function () {
             if (!instance) {
@@ -51,39 +50,156 @@ class TaskController {
 }
 
 // functions below here
-function insertTaskAjax (task) {
+function insertTaskAjax(task) {
     $.ajax({
         url: 'http://192.168.30.245:2525/api/update/insert',
         type: 'post',
         dataType: 'json',
         success: function (data) {
             $('h1').html(data.msg);
-            var newTask = new Task(data.task, )
+            //var newTask = new Task(data.task);
         },
         data: task
     });
 }
 
+function formatDate(date) {
+    var monthNames = [
+        "January", "February", "March",
+        "April", "May", "June", "July",
+        "August", "September", "October",
+        "November", "December"
+    ];
 
-$( document ).ready(function() {
+    var day = date.getDate();
+    var monthIndex = date.getMonth();
+    var year = date.getFullYear();
 
-    console.log( "ready!" );
-    // adding even handlers below here
-    $('button').click(function(){
-        insertTaskAjax({task: $('#task').val()});
-    });
+    return monthNames[monthIndex] + ' ' + day + ', ' + year;
+}
 
-    // main 
-    // load the tasks
+function getAllTasks(cb) {
     $.ajax({
         url: 'http://192.168.30.245:2525/api/tasks',
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            var tasks = JSON.parse(data);
-            console.log(tasks);
+            var tasks = data;
+            return cb(tasks);
         },
         data: {} // send nothing to get all tasks
     });
-// build them
+}
+
+function getCompletedTasks(cb) {
+    $.ajax({
+        url: 'http://192.168.30.245:2525/api/tasks',
+        type: 'get',
+        dataType: 'json',
+        success: function (data) {
+            var tasks = data;
+            return cb(tasks);
+        },
+        data: {
+            complete: true
+        } // send nothing to get all tasks
+    });
+}
+
+function getUncompletedTasks(cb) {
+    $.ajax({
+        url: 'http://192.168.30.245:2525/api/tasks',
+        type: 'get',
+        dataType: 'json',
+        success: function (data) {
+            var tasks = data;
+            return cb(tasks);
+        },
+        data: {
+            complete: false
+        } // send nothing to get all tasks
+    });
+}
+
+function addTaskElement(task) {
+    var li = document.createElement("li");
+    var div = document.createElement("div");
+    div.id = task._id;
+    // add click even to the div
+    $(div).click(changeChecked);
+    div.className = "checkbox";
+    li.appendChild(div);
+    var label = document.createElement("label");
+    div.appendChild(label);
+    var input = document.createElement("INPUT");
+    input.type = "checkbox";
+    input.checked = task.complete;
+    label.appendChild(input);
+    var strong = document.createElement("strong");
+    strong.innerHTML = task.task;
+    label.appendChild(strong);
+    // apped task to ul
+    $('#tasks').append(li);
+}
+
+function addAllTaskElements(tasks) {
+    tasks.tasks.forEach((task) => {
+        addTaskElement(task);
+    });
+}
+
+function clearAllTaskElements(task) {
+    $('#tasks').empty();
+}
+
+function changeChecked() {
+    console.log('hi');
+    var checked = $(this.firstChild.firstChild).is(':checked');
+    console.log(checked);
+    $.ajax({
+        url: 'http://192.168.30.245:2525/api/update/edit',
+        type: 'post',
+        dataType: 'json',
+        success: function (data) {
+            console.log(data);
+            // do an alert thingy??
+        },
+        data: {
+            _id: this.id,
+            complete: checked
+        }
+    });
+}
+// start of main 
+$(document).ready(function () {
+
+    document.getElementById('today').innerHTML = formatDate(new Date());
+    // adding even handlers below here
+    $('#add-task-btn').click(function () {
+        insertTaskAjax({
+            task: $('#task').val()
+        });
+    });
+    $('#see-completed-btn').click(function () {
+        getCompletedTasks((tasks) => {
+            clearAllTaskElements();
+            addAllTaskElements(tasks);
+        });
+    });
+    $('#see-all-btn').click(function () {
+        getAllTasks((tasks) => {
+            clearAllTaskElements();
+            addAllTaskElements(tasks);
+        });
+    });
+    $('#see-uncompleted-btn').click(function () {
+        getUncompletedTasks((tasks) => {
+            clearAllTaskElements();
+            addAllTaskElements(tasks);
+        });
+    });
+
+    // main 
+    // load the tasks
+    // build them
 });
