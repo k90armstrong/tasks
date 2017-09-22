@@ -170,6 +170,12 @@ function changeChecked() {
         }
     });
 }
+
+function clearBtnSelected() {
+    $('#see-uncompleted-btn').removeClass('btn-info');
+    $('#see-completed-btn').removeClass('btn-info');
+    $('#see-all-btn').removeClass('btn-info');
+}
 // start of main 
 $(document).ready(function () {
 
@@ -181,18 +187,24 @@ $(document).ready(function () {
         });
     });
     $('#see-completed-btn').click(function () {
+        clearBtnSelected();
+        $('#see-completed-btn').addClass('btn-info');
         getCompletedTasks((tasks) => {
             clearAllTaskElements();
             addAllTaskElements(tasks);
         });
     });
     $('#see-all-btn').click(function () {
+        clearBtnSelected();
+        $('#see-all-btn').addClass('btn-info');
         getAllTasks((tasks) => {
             clearAllTaskElements();
             addAllTaskElements(tasks);
         });
     });
     $('#see-uncompleted-btn').click(function () {
+        clearBtnSelected();
+        $('#see-uncompleted-btn').addClass('btn-info');
         getUncompletedTasks((tasks) => {
             clearAllTaskElements();
             addAllTaskElements(tasks);
