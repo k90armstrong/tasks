@@ -105,7 +105,7 @@ function getCompletedTasks(cb) {
     });
 }
 
-function getUncompletedTasks(cb) {
+function getIncompleteTasks(cb) {
     $.ajax({
         url: 'http://192.168.30.245:2525/api/tasks',
         type: 'get',
@@ -172,7 +172,7 @@ function changeChecked() {
 }
 
 function clearBtnSelected() {
-    $('#see-uncompleted-btn').removeClass('btn-info');
+    $('#see-incomplete-btn').removeClass('btn-info');
     $('#see-completed-btn').removeClass('btn-info');
     $('#see-all-btn').removeClass('btn-info');
 }
@@ -221,11 +221,11 @@ $(document).ready(function () {
             addAllTaskElements(tasks);
         });
     });
-    $('#see-uncompleted-btn').click(function () {
+    $('#see-incomplete-btn').click(function () {
         console.log('see uncomplete');
         clearBtnSelected();
-        $('#see-uncompleted-btn').addClass('btn-info');
-        getUncompletedTasks((tasks) => {
+        $('#see-incomplete-btn').addClass('btn-info');
+        getIncompleteTasks((tasks) => {
             clearAllTaskElements();
             addAllTaskElements(tasks);
         });
