@@ -52,7 +52,7 @@ class TaskController {
 // functions below here
 function insertTaskAjax(task, cb) {
     $.ajax({
-        url: 'http://192.168.30.245:2525/api/update/insert',
+        url: '/api/update/insert',
         type: 'post',
         dataType: 'json',
         success: function (task) {
@@ -79,7 +79,7 @@ function formatDate(date) {
 
 function getAllTasks(cb) {
     $.ajax({
-        url: 'http://192.168.30.245:2525/api/tasks',
+        url: '/api/tasks',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -92,7 +92,7 @@ function getAllTasks(cb) {
 
 function getCompletedTasks(cb) {
     $.ajax({
-        url: 'http://192.168.30.245:2525/api/tasks',
+        url: '/api/tasks',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -107,7 +107,7 @@ function getCompletedTasks(cb) {
 
 function getIncompleteTasks(cb) {
     $.ajax({
-        url: 'http://192.168.30.245:2525/api/tasks',
+        url: '/api/tasks',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -157,7 +157,7 @@ function changeChecked() {
     var checked = $(this.firstChild.firstChild).is(':checked');
     console.log(checked);
     $.ajax({
-        url: 'http://192.168.30.245:2525/api/update/edit',
+        url: '/api/update/edit',
         type: 'post',
         dataType: 'json',
         success: function (data) {
